@@ -196,7 +196,7 @@
 
     <div class="notice-banner">
         ✨ 開幕優惠：手部凝膠 / 客帶圖享 9 折<br>
-        🤍 五週內回店續作「本店卸甲免費」
+        🤍 五週內回店續作
     </div>
 
     <!-- 手部凝膠 & 客帶圖 (享9折) -->
@@ -226,13 +226,13 @@
             <div class="item-name">法式</div>
             <div class="item-price">$1,000</div>
         </div>
-        <div class="item-card" onclick="toggleGel(this, 1000, '客帶圖簡約款')">
+        <div class="item-card" id="custom-simple" onclick="toggleCustomGel(this, 1000, '客帶圖簡約款')">
             <div class="item-name">客帶圖簡約</div>
-            <div class="item-price">$1,000 up</div>
+            <div class="item-price" id="price-simple">$1,000起</div>
         </div>
-        <div class="item-card" onclick="toggleGel(this, 1200, '客帶圖複雜款')">
+        <div class="item-card" id="custom-complex" onclick="toggleCustomGel(this, 1200, '客帶圖複雜款')">
             <div class="item-name">客帶圖複雜</div>
-            <div class="item-price">$1,200 up</div>
+            <div class="item-price" id="price-complex">$1,200起</div>
         </div>
     </div>
 
@@ -282,7 +282,7 @@
         </div>
     </div>
     <div style="margin-top: 10px; font-size: 13px;">
-        <label><input type="checkbox" id="five-weeks" onchange="calculateTotal()" style="accent-color: var(--primary-color);"> 享五週內續作「本店卸甲免費」</label>
+        <label><input type="checkbox" id="five-weeks" onchange="calculateTotal()" style="accent-color: var(--primary-color);"> 享五週內續作</label>
     </div>
 
     <!-- 統計與複製 -->
@@ -307,11 +307,36 @@
             if (!el.classList.contains('off-card')) el.classList.remove('selected');
         });
 
+        document.getElementById('price-simple').innerText = '$1,000起';
+        document.getElementById('price-complex').innerText = '$1,200起';
+
         if (selectedGel.name === name) {
             selectedGel = { name: '', price: 0 };
         } else {
             element.classList.add('selected');
             selectedGel = { name, price };
+        }
+        calculateTotal();
+    }
+
+    function toggleCustomGel(element, minPrice, name) {
+        document.querySelectorAll('.grid .item-card').forEach(el => {
+            if (!el.classList.contains('off-card')) el.classList.remove('selected');
+        });
+
+        if (selectedGel.name === name) {
+            selectedGel = { name: '', price: 0 };
+            document.getElementById(name === '客帶圖簡約款' ? 'price-simple' : 'price-complex').innerText = `$${minPrice.toLocaleString()}起`;
+        } else {
+            let inputPrice = prompt(`請輸入 ${name} 的報價金額（最低 $${minPrice}）：`, minPrice);
+            if (inputPrice !== null && !isNaN(inputPrice) && inputPrice !== "") {
+                let finalPrice = Math.max(minPrice, parseInt(inputPrice));
+                element.classList.add('selected');
+                selectedGel = { name, price: finalPrice };
+                document.getElementById(name === '客帶圖簡約款' ? 'price-simple' : 'price-complex').innerText = `$${finalPrice.toLocaleString()}`;
+            } else {
+                selectedGel = { name: '', price: 0 };
+            }
         }
         calculateTotal();
     }
@@ -370,7 +395,7 @@
         if (qtyRepair > 0) detail += `• 補甲：${qtyRepair} 指 ($${qtyRepair * 50})\n`;
         if (document.getElementById('base-color').checked) detail += `• 底色 (整手)：$100\n`;
         if (selectedOff.name) {
-            detail += `• 卸甲：${selectedOff.name} (${res.offPrice === 0 ? '五週內免費' : '$' + res.offPrice})\n`;
+            detail += `• 卸甲：${selectedOff.name} (${res.offPrice === 0 ? '五週內優惠' : '$' + res.offPrice})\n`;
         }
         detail += `---------------\n`;
         detail += `預估總金額：$${res.grandTotal} 元`;
