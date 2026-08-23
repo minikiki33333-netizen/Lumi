@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拾初 LUMI - 服務估價計算機</title>
+    <style>
+        :root {
+            --bg-color: #F9F6F0;
+            --card-bg: #FFFFFF;
+            --primary-color: #8C7462;
+            --accent-color: #A38570;
+            --tag-bg: #EFE8E1;
+            --text-main: #4A4238;
+            --text-sub: #7A7067;
+            --border-color: #E6DFD5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(140, 116, 98, 0.08);
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            letter-spacing: 2px;
+            margin: 0 0 6px 0;
+            color: var(--primary-color);
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        .notice-banner {
+            background-color: var(--tag-bg);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 20px 0 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .badge {
+            font-size: 11px;
+            background-color: #D9C3B0;
+            color: #FFF;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: normal;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .item-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: #FAF8F5;
+        }
+
+        .item-card.selected {
+            border-color: var(--accent-color);
+            background-color: #F3ECE5;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .item-price {
+            font-size: 13px;
+            color: var(--accent-color);
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #FAF8F5;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background-color: #FFF;
+            color: var(--primary-color);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .summary-box {
+            margin-top: 24px;
+            background-color: var(--tag-bg);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: var(--text-sub);
+        }
+
+        .summary-row.total {
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .copy-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 16px;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn:active {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>拾初 L U M I</h1>
+        <p>NAIL STUDIO 服務估價</p>
+    </div>
+
+    <div class="notice-banner">
+        ✨ 開幕優惠：手部凝膠 / 客帶圖享 9 折<br>
+        🤍 五週內回店續作「本店卸甲免費」
+    </div>
+
+    <!-- 手部凝膠 & 客帶圖 (享9折) -->
+    <div class="section-title">手部凝膠 & 客帶圖 <span class="badge">享 9 折</span></div>
+    <div class="grid">
+        <div class="item-card" onclick="toggleGel(this, 700, '手部單色')">
+            <div class="item-name">單色</div>
+            <div class="item-price">$700</div>
+        </div>
+        <div class="item-card" onclick="toggleGel(this, 800, '貓眼')">
+            <div class="item-name">貓眼</div>
+            <div class="item-price">$800</div>
+        </div>
+        <div class="item-card" onclick="toggleGel(this, 800, '碎鑽')">
+            <div class="item-name">碎鑽</div>
+            <div class="item-price">$800</div>
+        </div>
+        <div class="item-card" onclick="toggleGel(this, 900, '漸層')">
+            <div class="item-name">漸層</div>
+            <div class="item-price">$900</div>
+        </div>
+        <div class="item-card" onclick="toggleGel(this, 900, '鏡面')">
+            <div class="item-name">鏡面</div>
+            <div class="item-price">$900</div>
+        </div>
+        <div class="item-card" onclick="toggleGel(this, 1000, '法式')">
+            <div class="item-name">法式</div>
+            <div class="item-price">$1,000</div>
+        </div>
+        <div class="item-card" onclick="toggleGel(this, 1000, '客帶圖簡約款')">
+            <div class="item-name">客帶圖簡約</div>
+            <div class="item-price">$1,000 up</div>
+        </div>
+        <div class="item-card" onclick="toggleGel(this, 1200, '客帶圖複雜款')">
+            <div class="item-name">客帶圖複雜</div>
+            <div class="item-price">$1,200 up</div>
+        </div>
+    </div>
+
+    <!-- 加購項目 (不折扣) -->
+    <div class="section-title">加購項目 <span class="badge" style="background:#B3A296">不折扣</span></div>
+    <div class="qty-control">
+        <div>
+            <div class="item-name">單指延甲 ($80/指)</div>
+        </div>
+        <div>
+            <button class="qty-btn" onclick="changeQty('extension', -1)">-</button>
+            <span id="qty-extension" style="margin: 0 8px;">0</span>
+            <button class="qty-btn" onclick="changeQty('extension', 1)">+</button>
+        </div>
+    </div>
+    <div class="qty-control">
+        <div>
+            <div class="item-name">補甲 ($50/指)</div>
+        </div>
+        <div>
+            <button class="qty-btn" onclick="changeQty('repair', -1)">-</button>
+            <span id="qty-repair" style="margin: 0 8px;">0</span>
+            <button class="qty-btn" onclick="changeQty('repair', 1)">+</button>
+        </div>
+    </div>
+    <div class="qty-control">
+        <div>
+            <div class="item-name">底色 (整手) ($100)</div>
+        </div>
+        <input type="checkbox" id="base-color" onchange="calculateTotal()" style="accent-color: var(--primary-color); transform: scale(1.2);">
+    </div>
+
+    <!-- 卸甲服務 (不折扣) -->
+    <div class="section-title">卸甲服務 <span class="badge" style="background:#B3A296">不折扣</span></div>
+    <div class="grid">
+        <div class="item-card off-card" onclick="selectOff(this, 100, '本店卸甲+續作')">
+            <div class="item-name">本店卸甲+續作</div>
+            <div class="item-price">$100</div>
+        </div>
+        <div class="item-card off-card" onclick="selectOff(this, 200, '他店卸甲+續作')">
+            <div class="item-name">他店卸甲+續作</div>
+            <div class="item-price">$200</div>
+        </div>
+        <div class="item-card off-card" onclick="selectOff(this, 300, '本店卸甲不續作')">
+            <div class="item-name">本店卸甲不續作</div>
+            <div class="item-price">$300</div>
+        </div>
+    </div>
+    <div style="margin-top: 10px; font-size: 13px;">
+        <label><input type="checkbox" id="five-weeks" onchange="calculateTotal()" style="accent-color: var(--primary-color);"> 享五週內續作「本店卸甲免費」</label>
+    </div>
+
+    <!-- 統計與複製 -->
+    <div class="summary-box">
+        <div class="summary-row"><span>凝膠原價：</span><span id="gel-original">$0</span></div>
+        <div class="summary-row"><span>開幕 9 折小計：</span><span id="gel-discounted">$0</span></div>
+        <div class="summary-row"><span>加購 & 卸甲小計：</span><span id="extra-total">$0</span></div>
+        <div class="summary-row total"><span>預估總金額：</span><span id="grand-total">$0</span></div>
+    </div>
+
+    <button class="copy-btn" onclick="copyResult()">複製預約估價明細</button>
+</div>
+
+<script>
+    let selectedGel = { name: '', price: 0 };
+    let selectedOff = { name: '', price: 0 };
+    let qtyExtension = 0;
+    let qtyRepair = 0;
+
+    function toggleGel(element, price, name) {
+        document.querySelectorAll('.grid .item-card').forEach(el => {
+            if (!el.classList.contains('off-card')) el.classList.remove('selected');
+        });
+
+        if (selectedGel.name === name) {
+            selectedGel = { name: '', price: 0 };
+        } else {
+            element.classList.add('selected');
+            selectedGel = { name, price };
+        }
+        calculateTotal();
+    }
+
+    function selectOff(element, price, name) {
+        document.querySelectorAll('.off-card').forEach(el => el.classList.remove('selected'));
+
+        if (selectedOff.name === name) {
+            selectedOff = { name: '', price: 0 };
+        } else {
+            element.classList.add('selected');
+            selectedOff = { name, price };
+        }
+        calculateTotal();
+    }
+
+    function changeQty(type, change) {
+        if (type === 'extension') {
+            qtyExtension = Math.max(0, qtyExtension + change);
+            document.getElementById('qty-extension').innerText = qtyExtension;
+        } else if (type === 'repair') {
+            qtyRepair = Math.max(0, qtyRepair + change);
+            document.getElementById('qty-repair').innerText = qtyRepair;
+        }
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let gelOrig = selectedGel.price;
+        let gelDisc = Math.round(gelOrig * 0.9);
+
+        let extra = (qtyExtension * 80) + (qtyRepair * 50);
+        if (document.getElementById('base-color').checked) extra += 100;
+
+        let offPrice = selectedOff.price;
+        if (document.getElementById('five-weeks').checked && selectedOff.name === '本店卸甲+續作') {
+            offPrice = 0;
+        }
+        extra += offPrice;
+
+        let grandTotal = gelDisc + extra;
+
+        document.getElementById('gel-original').innerText = `$${gelOrig}`;
+        document.getElementById('gel-discounted').innerText = `$${gelDisc}`;
+        document.getElementById('extra-total').innerText = `$${extra}`;
+        document.getElementById('grand-total').innerText = `$${grandTotal}`;
+
+        return { gelOrig, gelDisc, extra, grandTotal, offPrice };
+    }
+
+    function copyResult() {
+        const res = calculateTotal();
+        let detail = `【拾初 LUMI 服務預估明細】\n`;
+        if (selectedGel.name) detail += `• 主項目：${selectedGel.name} ($${selectedGel.price} -> 9折 $${res.gelDisc})\n`;
+        if (qtyExtension > 0) detail += `• 單指延甲：${qtyExtension} 指 ($${qtyExtension * 80})\n`;
+        if (qtyRepair > 0) detail += `• 補甲：${qtyRepair} 指 ($${qtyRepair * 50})\n`;
+        if (document.getElementById('base-color').checked) detail += `• 底色 (整手)：$100\n`;
+        if (selectedOff.name) {
+            detail += `• 卸甲：${selectedOff.name} (${res.offPrice === 0 ? '五週內免費' : '$' + res.offPrice})\n`;
+        }
+        detail += `---------------\n`;
+        detail += `預估總金額：$${res.grandTotal} 元`;
+
+        navigator.clipboard.writeText(detail).then(() => {
+            alert('估價明細已複製！可以貼給客人囉');
+        });
+    }
+</script>
+
+</body>
+</html>
