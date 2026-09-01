@@ -3,407 +3,839 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>拾初 LUMI - 服務估價計算機</title>
+    <title>拾初 LUMI - 美甲服務估價計算機</title>
     <style>
         :root {
-            --bg-color: #F9F6F0;
-            --card-bg: #FFFFFF;
-            --primary-color: #8C7462;
-            --accent-color: #A38570;
-            --tag-bg: #EFE8E1;
-            --text-main: #4A4238;
-            --text-sub: #7A7067;
-            --border-color: #E6DFD5;
+            --bg-color: #f7f3ed;
+            --card-bg: #ffffff;
+            --primary-color: #8c7365;
+            --primary-light: #efe8e1;
+            --accent-color: #b8860b;
+            --text-main: #4a403a;
+            --text-muted: #8a7e78;
+            --border-color: #e5dad0;
+            --discount-red: #c0564b;
+            --shadow: 0 10px 25px -5px rgba(140, 115, 101, 0.08), 0 8px 10px -6px rgba(140, 115, 101, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
+            padding: 20px 12px 40px 12px;
             display: flex;
             justify-content: center;
+            min-height: 100vh;
         }
 
         .container {
             width: 100%;
-            max-width: 480px;
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 15px rgba(140, 116, 98, 0.08);
-            box-sizing: border-box;
+            max-width: 540px;
+            margin: 0 auto;
         }
 
-        .header {
+        header {
             text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 16px;
             margin-bottom: 20px;
+            padding: 10px 0;
         }
 
-        .header h1 {
-            font-size: 22px;
-            letter-spacing: 2px;
-            margin: 0 0 6px 0;
+        header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 3px;
             color: var(--primary-color);
+            margin-bottom: 4px;
         }
 
-        .header p {
+        header p {
             font-size: 13px;
-            color: var(--text-sub);
-            margin: 0;
+            color: var(--text-muted);
             letter-spacing: 1px;
         }
 
-        .notice-banner {
-            background-color: var(--tag-bg);
-            border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 12px;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            line-height: 1.5;
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 18px 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
         }
 
         .section-title {
             font-size: 15px;
             font-weight: 600;
             color: var(--primary-color);
-            margin: 20px 0 12px 0;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 8px;
         }
 
-        .badge {
-            font-size: 11px;
-            background-color: #D9C3B0;
-            color: #FFF;
-            padding: 2px 8px;
+        .section-title::before {
+            content: "✦";
+            font-size: 12px;
+            color: var(--primary-color);
+        }
+
+        /* 模式切換器 */
+        .mode-selector {
+            display: flex;
+            background-color: var(--primary-light);
             border-radius: 12px;
-            font-weight: normal;
+            padding: 4px;
+            margin-bottom: 16px;
+            gap: 4px;
         }
 
-        .grid {
+        .mode-btn {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background: transparent;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .mode-btn .tag {
+            font-size: 10px;
+            background: var(--discount-red);
+            color: white;
+            padding: 1px 5px;
+            border-radius: 8px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+
+        /* Grid 選項 */
+        .grid-2 {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
 
-        .item-card {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .option-card {
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 10px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s ease;
-            background-color: #FAF8F5;
+            background: #fff;
+            position: relative;
+            user-select: none;
         }
 
-        .item-card.selected {
-            border-color: var(--accent-color);
-            background-color: #F3ECE5;
+        .option-card.selected {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
         }
 
-        .item-name {
+        .option-name {
             font-size: 14px;
             font-weight: 500;
             margin-bottom: 4px;
         }
 
-        .item-price {
+        .option-price {
             font-size: 13px;
-            color: var(--accent-color);
+            color: var(--primary-color);
+            font-weight: 600;
         }
 
-        .qty-control {
+        .option-subtext {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* 輸入框項目 */
+        .custom-price-input {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .custom-price-input.active {
+            display: block;
+        }
+
+        .input-group {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background-color: #FAF8F5;
+            gap: 8px;
+            background: #faf8f5;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 8px;
             padding: 8px 12px;
-            margin-bottom: 8px;
         }
 
-        .qty-btn {
+        .input-group label {
+            font-size: 13px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .input-group input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-color);
+            outline: none;
+            text-align: right;
+        }
+
+        /* 增減計數器 */
+        .counter-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .counter-item:last-child {
+            border-bottom: none;
+        }
+
+        .counter-info .title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .counter-info .price {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-circle {
             width: 28px;
             height: 28px;
             border-radius: 50%;
             border: 1px solid var(--border-color);
-            background-color: #FFF;
+            background: #fff;
             color: var(--primary-color);
             font-size: 16px;
-            cursor: pointer;
+            font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            user-select: none;
         }
 
-        .summary-box {
-            margin-top: 24px;
-            background-color: var(--tag-bg);
+        .btn-circle:active {
+            background-color: var(--primary-light);
+        }
+
+        .counter-value {
+            font-size: 14px;
+            font-weight: 600;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* 開關與 Checkbox */
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-custom.checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .checkbox-custom.checked::after {
+            content: "✓";
+            font-size: 12px;
+        }
+
+        /* 活動說明 Banner */
+        .promo-banner {
+            background: linear-gradient(135deg, #fef9f3 0%, #f7efe5 100%);
+            border: 1px solid #e8d7c8;
             border-radius: 12px;
-            padding: 16px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #6b5b52;
+            line-height: 1.5;
         }
 
-        .summary-row {
+        .promo-banner strong {
+            color: var(--discount-red);
+        }
+
+        /* 總金額計算卡片 */
+        .total-card {
+            background: var(--primary-color);
+            border-radius: 16px;
+            padding: 20px;
+            color: #ffffff;
+            box-shadow: 0 10px 20px rgba(140, 115, 101, 0.25);
+            margin-top: 24px;
+        }
+
+        .total-card * {
+            color: #ffffff;
+        }
+
+        .total-header {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
-            margin-bottom: 8px;
-            color: var(--text-sub);
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
         }
 
-        .summary-row.total {
-            border-top: 1px solid var(--border-color);
-            padding-top: 10px;
-            margin-top: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .copy-btn {
-            width: 100%;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 14px;
+        .total-title {
             font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 16px;
             letter-spacing: 1px;
         }
 
-        .copy-btn:active {
+        .total-amount {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .breakdown-list {
+            font-size: 12px;
+            line-height: 1.8;
             opacity: 0.9;
+            margin-bottom: 16px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .btn-copy {
+            width: 100%;
+            padding: 14px;
+            background: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-color) !important;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-copy:active {
+            transform: scale(0.98);
+            background: var(--primary-light);
+        }
+
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>拾初 L U M I</h1>
-        <p>NAIL STUDIO 服務估價</p>
-    </div>
+    <header>
+        <h1>拾初 LUMI</h1>
+        <p>NAIL STUDIO 預約服務估價</p>
+    </header>
 
-    <div class="notice-banner">
-        ✨ 開幕優惠：手部凝膠 / 客帶圖享 9 折<br>
-        🤍 五週內回店續作「卸甲免費」
-    </div>
+    <!-- 優惠活動選擇器 -->
+    <div class="section-card">
+        <div class="section-title">選擇計價模式 / 活動</div>
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setPromo('opening')">開幕 9 折 <span class="tag">優惠</span></button>
+            <button class="mode-btn" onclick="setPromo('handmodel')">徵手模 <span class="tag">限量</span></button>
+            <button class="mode-btn" onclick="setPromo('regular')">原價計算</button>
+        </div>
 
-    <!-- 手部凝膠 & 客帶圖 (享9折) -->
-    <div class="section-title">手部凝膠 & 客帶圖 <span class="badge">享 9 折</span></div>
-    <div class="grid">
-        <div class="item-card" onclick="toggleGel(this, 700, '手部單色')">
-            <div class="item-name">單色</div>
-            <div class="item-price">$700</div>
-        </div>
-        <div class="item-card" onclick="toggleGel(this, 800, '貓眼')">
-            <div class="item-name">貓眼</div>
-            <div class="item-price">$800</div>
-        </div>
-        <div class="item-card" onclick="toggleGel(this, 800, '碎鑽')">
-            <div class="item-name">碎鑽</div>
-            <div class="item-price">$800</div>
-        </div>
-        <div class="item-card" onclick="toggleGel(this, 900, '漸層')">
-            <div class="item-name">漸層</div>
-            <div class="item-price">$900</div>
-        </div>
-        <div class="item-card" onclick="toggleGel(this, 900, '鏡面')">
-            <div class="item-name">鏡面</div>
-            <div class="item-price">$900</div>
-        </div>
-        <div class="item-card" onclick="toggleGel(this, 1000, '法式')">
-            <div class="item-name">法式</div>
-            <div class="item-price">$1,000</div>
-        </div>
-        <div class="item-card" id="custom-simple" onclick="toggleCustomGel(this, 1000, '客帶圖簡約款')">
-            <div class="item-name">客帶圖簡約</div>
-            <div class="item-price" id="price-simple">$1,000起</div>
-        </div>
-        <div class="item-card" id="custom-complex" onclick="toggleCustomGel(this, 1200, '客帶圖複雜款')">
-            <div class="item-name">客帶圖複雜</div>
-            <div class="item-price" id="price-complex">$1,200起</div>
+        <div id="promo-desc" class="promo-banner">
+            ✨ <strong>開幕優惠活動中</strong>：手部凝膠與自帶圖款式享 <strong>9 折</strong>優惠！加購及卸甲不參與折扣。
         </div>
     </div>
 
-    <!-- 加購項目 (不折扣) -->
-    <div class="section-title">加購項目 <span class="badge" style="background:#B3A296">不折扣</span></div>
-    <div class="qty-control">
-        <div>
-            <div class="item-name">單指延甲 ($80/指)</div>
+    <!-- 主服務選擇 -->
+    <div class="section-card">
+        <div class="section-title" id="main-service-title">款式選擇</div>
+        
+        <!-- 一般款式 (開幕9折 / 原價 模式) -->
+        <div id="regular-services">
+            <div class="grid-2" style="margin-bottom: 10px;">
+                <div class="option-card" onclick="selectMain('單色', 700)" id="opt-單色">
+                    <div class="option-name">單色</div>
+                    <div class="option-price">$700</div>
+                    <div class="option-subtext">純色 / 可跳一色</div>
+                </div>
+                <div class="option-card" onclick="selectMain('貓眼', 800)" id="opt-貓眼">
+                    <div class="option-name">貓眼</div>
+                    <div class="option-price">$800</div>
+                </div>
+                <div class="option-card" onclick="selectMain('碎鑽', 800)" id="opt-碎鑽">
+                    <div class="option-name">碎鑽</div>
+                    <div class="option-price">$800</div>
+                </div>
+                <div class="option-card" onclick="selectMain('漸層', 900)" id="opt-漸層">
+                    <div class="option-name">漸層</div>
+                    <div class="option-price">$900</div>
+                </div>
+                <div class="option-card" onclick="selectMain('鏡面', 900)" id="opt-鏡面">
+                    <div class="option-name">鏡面</div>
+                    <div class="option-price">$900</div>
+                </div>
+                <div class="option-card" onclick="selectMain('法式', 1000)" id="opt-法式">
+                    <div class="option-name">法式</div>
+                    <div class="option-price">$1,000</div>
+                </div>
+            </div>
+
+            <!-- 客帶圖選擇 -->
+            <div class="option-card" onclick="selectMain('客帶圖', 0)" id="opt-客帶圖">
+                <div class="option-name">客帶圖報價 ($1,000 up)</div>
+                <div class="option-subtext">點擊輸入美甲師報價金額</div>
+            </div>
+
+            <div id="custom-price-container" class="custom-price-input">
+                <div class="input-group">
+                    <label>自帶圖報價：$</label>
+                    <input type="number" id="custom-price" placeholder="請輸入報價金額" value="1000" oninput="updateCalculation()">
+                </div>
+            </div>
         </div>
-        <div>
-            <button class="qty-btn" onclick="changeQty('extension', -1)">-</button>
-            <span id="qty-extension" style="margin: 0 8px;">0</span>
-            <button class="qty-btn" onclick="changeQty('extension', 1)">+</button>
+
+        <!-- 徵手模服務 (限定 10 名) -->
+        <div id="handmodel-services" style="display: none;">
+            <div class="grid-2">
+                <div class="option-card" onclick="selectHandmodel('手模-單色', 490)" id="opt-hm-單色">
+                    <div class="option-name">手模 - 單色</div>
+                    <div class="option-price">$490</div>
+                </div>
+                <div class="option-card" onclick="selectHandmodel('手模-款式', 790)" id="opt-hm-款式">
+                    <div class="option-name">手模 - 款式</div>
+                    <div class="option-price">$790</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 12px;">
+                <div class="checkbox-item" onclick="toggleHandmodelCatEye()">
+                    <div class="checkbox-label">
+                        <div class="checkbox-custom" id="hm-cateye-check"></div>
+                        <span>單色加購貓眼 (+$100)</span>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="qty-control">
-        <div>
-            <div class="item-name">補甲 ($50/指)</div>
+
+        <!-- 足部項目加購 -->
+        <div style="margin-top: 14px; border-top: 1px dashed var(--border-color); padding-top: 12px;">
+            <div class="checkbox-item" onclick="toggleFootService()">
+                <div class="checkbox-label">
+                    <div class="checkbox-custom" id="foot-check"></div>
+                    <div>
+                        <div style="font-weight: 500;">轉為足部凝膠項目</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">足部項目全品項 +$100</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>
-            <button class="qty-btn" onclick="changeQty('repair', -1)">-</button>
-            <span id="qty-repair" style="margin: 0 8px;">0</span>
-            <button class="qty-btn" onclick="changeQty('repair', 1)">+</button>
-        </div>
-    </div>
-    <div class="qty-control">
-        <div>
-            <div class="item-name">底色 (整手) ($100)</div>
-        </div>
-        <input type="checkbox" id="base-color" onchange="calculateTotal()" style="accent-color: var(--primary-color); transform: scale(1.2);">
     </div>
 
-    <!-- 卸甲服務 (不折扣) -->
-    <div class="section-title">卸甲服務 <span class="badge" style="background:#B3A296">不折扣</span></div>
-    <div class="grid">
-        <div class="item-card off-card" onclick="selectOff(this, 100, '本店卸甲+續作')">
-            <div class="item-name">本店卸甲+續作</div>
-            <div class="item-price">$100</div>
+    <!-- 加購項目 -->
+    <div class="section-card">
+        <div class="section-title">加購項目</div>
+        <div class="counter-item">
+            <div class="counter-info">
+                <div class="title">單指延甲</div>
+                <div class="price">$80 / 指 (不接 10 指延甲)</div>
+            </div>
+            <div class="counter-controls">
+                <button class="btn-circle" onclick="changeQty('extension', -1)">-</button>
+                <span class="counter-value" id="qty-extension">0</span>
+                <button class="btn-circle" onclick="changeQty('extension', 1)">+</button>
+            </div>
         </div>
-        <div class="item-card off-card" onclick="selectOff(this, 200, '他店卸甲+續作')">
-            <div class="item-name">他店卸甲+續作</div>
-            <div class="item-price">$200</div>
+        <div class="counter-item">
+            <div class="counter-info">
+                <div class="title">底色 (整手)</div>
+                <div class="price">$100 / 次</div>
+            </div>
+            <div class="counter-controls">
+                <button class="btn-circle" onclick="changeQty('baseColor', -1)">-</button>
+                <span class="counter-value" id="qty-baseColor">0</span>
+                <button class="btn-circle" onclick="changeQty('baseColor', 1)">+</button>
+            </div>
         </div>
-        <div class="item-card off-card" onclick="selectOff(this, 300, '本店卸甲不續作')">
-            <div class="item-name">本店卸甲不續作</div>
-            <div class="item-price">$300</div>
+        <div class="counter-item">
+            <div class="counter-info">
+                <div class="title">補甲 (單指)</div>
+                <div class="price">$50 / 指</div>
+            </div>
+            <div class="counter-controls">
+                <button class="btn-circle" onclick="changeQty('repair', -1)">-</button>
+                <span class="counter-value" id="qty-repair">0</span>
+                <button class="btn-circle" onclick="changeQty('repair', 1)">+</button>
+            </div>
         </div>
-    </div>
-    <div style="margin-top: 10px; font-size: 13px;">
-        <label><input type="checkbox" id="five-weeks" onchange="calculateTotal()" style="accent-color: var(--primary-color);"> 享五週內續作「卸甲免費」</label>
     </div>
 
-    <!-- 統計與複製 -->
-    <div class="summary-box">
-        <div class="summary-row"><span>凝膠原價：</span><span id="gel-original">$0</span></div>
-        <div class="summary-row"><span>開幕 9 折小計：</span><span id="gel-discounted">$0</span></div>
-        <div class="summary-row"><span>加購 & 卸甲小計：</span><span id="extra-total">$0</span></div>
-        <div class="summary-row total"><span>預估總金額：</span><span id="grand-total">$0</span></div>
+    <!-- 卸甲服務 -->
+    <div class="section-card">
+        <div class="section-title">卸甲服務</div>
+        <div class="grid-3">
+            <div class="option-card" onclick="selectOff('none', 0)" id="opt-off-none">
+                <div class="option-name">無需卸甲</div>
+                <div class="option-price">$0</div>
+            </div>
+            <div class="option-card" onclick="selectOff('本店續作', 100)" id="opt-off-本店續作">
+                <div class="option-name">本店續作</div>
+                <div class="option-price" id="price-off-本店續作">$100</div>
+            </div>
+            <div class="option-card" onclick="selectOff('他店續作', 200)" id="opt-off-他店續作">
+                <div class="option-name">他店續作</div>
+                <div class="option-price">$200</div>
+            </div>
+        </div>
+
+        <div class="option-card" style="margin-top: 10px;" onclick="selectOff('本店不續作', 300)" id="opt-off-本店不續作">
+            <div class="option-name">本店不續作</div>
+            <div class="option-price">$300</div>
+        </div>
+
+        <!-- 5週內回店免卸甲費選項 -->
+        <div style="margin-top: 12px;" id="five-week-container">
+            <div class="checkbox-item" onclick="toggleFiveWeek()">
+                <div class="checkbox-label">
+                    <div class="checkbox-custom" id="five-week-check"></div>
+                    <div>
+                        <span style="font-size: 13px; font-weight: 500;">符合「五週內回店續作」福利</span>
+                        <div style="font-size: 11px; color: var(--discount-red);">本店卸甲免費 ($100 → $0)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <button class="copy-btn" onclick="copyResult()">複製預約估價明細</button>
+    <!-- 總計卡片 -->
+    <div class="total-card">
+        <div class="total-header">
+            <div class="total-title">預估金額總計</div>
+            <div class="total-amount" id="total-amount">$0</div>
+        </div>
+        <div class="breakdown-list" id="breakdown-list">
+            - 請選擇服務項目 -
+        </div>
+        <button class="btn-copy" onclick="copyDetail()">一鍵複製預約明細</button>
+    </div>
 </div>
 
+<div class="toast" id="toast">預約明細已複製到剪貼簿！</div>
+
 <script>
-    let selectedGel = { name: '', price: 0 };
-    let selectedOff = { name: '', price: 0 };
-    let qtyExtension = 0;
-    let qtyRepair = 0;
+    // 狀態管理
+    let state = {
+        promo: 'opening', // 'opening', 'handmodel', 'regular'
+        mainService: null, // { name: '單色', price: 700 }
+        isFoot: false,
+        
+        // 手模專用
+        hmCatEye: false,
 
-    function toggleGel(element, price, name) {
-        document.querySelectorAll('.grid .item-card').forEach(el => {
-            if (!el.classList.contains('off-card')) el.classList.remove('selected');
+        // 加購項目
+        qty: {
+            extension: 0,
+            baseColor: 0,
+            repair: 0
+        },
+
+        // 卸甲
+        offService: { name: '無需卸甲', price: 0 },
+        isFiveWeek: false
+    };
+
+    const PROMO_DESCS = {
+        opening: '✨ <strong>開幕優惠活動中</strong>：手部凝膠與自帶圖款式享 <strong>9 折</strong>優惠！加購及卸甲不參與折扣。',
+        handmodel: '🌸 <strong>徵手模快閃早鳥優惠</strong>（限預約前 10 名）：單色 $490 / 款式 $790，優惠不受原價影響，<strong>不得與 9 折併用</strong>。',
+        regular: '📋 <strong>原價計算模式</strong>：依價目表標準金額計算。'
+    };
+
+    function setPromo(mode) {
+        state.promo = mode;
+        
+        // UI 切換
+        document.querySelectorAll('.mode-btn').forEach((btn, idx) => {
+            btn.classList.remove('active');
         });
+        if(mode === 'opening') document.querySelectorAll('.mode-btn')[0].classList.add('active');
+        if(mode === 'handmodel') document.querySelectorAll('.mode-btn')[1].classList.add('active');
+        if(mode === 'regular') document.querySelectorAll('.mode-btn')[2].classList.add('active');
 
-        document.getElementById('price-simple').innerText = '$1,000起';
-        document.getElementById('price-complex').innerText = '$1,200起';
+        document.getElementById('promo-desc').innerHTML = PROMO_DESCS[mode];
 
-        if (selectedGel.name === name) {
-            selectedGel = { name: '', price: 0 };
+        if(mode === 'handmodel') {
+            document.getElementById('regular-services').style.display = 'none';
+            document.getElementById('handmodel-services').style.display = 'block';
+            // 預設選取第一個手模項目
+            selectHandmodel('手模-單色', 490);
         } else {
-            element.classList.add('selected');
-            selectedGel = { name, price };
-        }
-        calculateTotal();
-    }
-
-    function toggleCustomGel(element, minPrice, name) {
-        document.querySelectorAll('.grid .item-card').forEach(el => {
-            if (!el.classList.contains('off-card')) el.classList.remove('selected');
-        });
-
-        if (selectedGel.name === name) {
-            selectedGel = { name: '', price: 0 };
-            document.getElementById(name === '客帶圖簡約款' ? 'price-simple' : 'price-complex').innerText = `$${minPrice.toLocaleString()}起`;
-        } else {
-            let inputPrice = prompt(`請輸入 ${name} 的報價金額（最低 $${minPrice}）：`, minPrice);
-            if (inputPrice !== null && !isNaN(inputPrice) && inputPrice !== "") {
-                let finalPrice = Math.max(minPrice, parseInt(inputPrice));
-                element.classList.add('selected');
-                selectedGel = { name, price: finalPrice };
-                document.getElementById(name === '客帶圖簡約款' ? 'price-simple' : 'price-complex').innerText = `$${finalPrice.toLocaleString()}`;
-            } else {
-                selectedGel = { name: '', price: 0 };
+            document.getElementById('regular-services').style.display = 'block';
+            document.getElementById('handmodel-services').style.display = 'none';
+            if(!state.mainService || state.mainService.name.startsWith('手模')) {
+                selectMain('單色', 700);
             }
         }
-        calculateTotal();
+
+        updateCalculation();
     }
 
-    function selectOff(element, price, name) {
-        document.querySelectorAll('.off-card').forEach(el => el.classList.remove('selected'));
+    function selectMain(name, price) {
+        state.mainService = { name, price };
+        
+        // 清除選擇樣式
+        document.querySelectorAll('#regular-services .option-card').forEach(el => el.classList.remove('selected'));
+        
+        const target = document.getElementById('opt-' + name);
+        if(target) target.classList.add('selected');
 
-        if (selectedOff.name === name) {
-            selectedOff = { name: '', price: 0 };
+        const customPriceBox = document.getElementById('custom-price-container');
+        if(name === '客帶圖') {
+            customPriceBox.classList.add('active');
         } else {
-            element.classList.add('selected');
-            selectedOff = { name, price };
+            customPriceBox.classList.remove('active');
         }
-        calculateTotal();
+
+        updateCalculation();
     }
 
-    function changeQty(type, change) {
-        if (type === 'extension') {
-            qtyExtension = Math.max(0, qtyExtension + change);
-            document.getElementById('qty-extension').innerText = qtyExtension;
-        } else if (type === 'repair') {
-            qtyRepair = Math.max(0, qtyRepair + change);
-            document.getElementById('qty-repair').innerText = qtyRepair;
-        }
-        calculateTotal();
+    function selectHandmodel(name, price) {
+        state.mainService = { name, price };
+        document.querySelectorAll('#handmodel-services .option-card').forEach(el => el.classList.remove('selected'));
+        const target = document.getElementById('opt-hm-' + (name.includes('單色') ? '單色' : '款式'));
+        if(target) target.classList.add('selected');
+
+        updateCalculation();
     }
 
-    function calculateTotal() {
-        let gelOrig = selectedGel.price;
-        let gelDisc = Math.round(gelOrig * 0.9);
-
-        let extra = (qtyExtension * 80) + (qtyRepair * 50);
-        if (document.getElementById('base-color').checked) extra += 100;
-
-        let offPrice = selectedOff.price;
-        if (document.getElementById('five-weeks').checked && selectedOff.name === '本店卸甲+續作') {
-            offPrice = 0;
-        }
-        extra += offPrice;
-
-        let grandTotal = gelDisc + extra;
-
-        document.getElementById('gel-original').innerText = `$${gelOrig}`;
-        document.getElementById('gel-discounted').innerText = `$${gelDisc}`;
-        document.getElementById('extra-total').innerText = `$${extra}`;
-        document.getElementById('grand-total').innerText = `$${grandTotal}`;
-
-        return { gelOrig, gelDisc, extra, grandTotal, offPrice };
+    function toggleHandmodelCatEye() {
+        state.hmCatEye = !state.hmCatEye;
+        const check = document.getElementById('hm-cateye-check');
+        if(state.hmCatEye) check.classList.add('checked');
+        else check.classList.remove('checked');
+        updateCalculation();
     }
 
-    function copyResult() {
-        const res = calculateTotal();
-        let detail = `【拾初 LUMI 服務預估明細】\n`;
-        if (selectedGel.name) detail += `• 主項目：${selectedGel.name} ($${selectedGel.price} -> 9折 $${res.gelDisc})\n`;
-        if (qtyExtension > 0) detail += `• 單指延甲：${qtyExtension} 指 ($${qtyExtension * 80})\n`;
-        if (qtyRepair > 0) detail += `• 補甲：${qtyRepair} 指 ($${qtyRepair * 50})\n`;
-        if (document.getElementById('base-color').checked) detail += `• 底色 (整手)：$100\n`;
-        if (selectedOff.name) {
-            detail += `• 卸甲：${selectedOff.name} (${res.offPrice === 0 ? '五週內優惠' : '$' + res.offPrice})\n`;
-        }
-        detail += `---------------\n`;
-        detail += `預估總金額：$${res.grandTotal} 元`;
+    function toggleFootService() {
+        state.isFoot = !state.isFoot;
+        const check = document.getElementById('foot-check');
+        if(state.isFoot) check.classList.add('checked');
+        else check.classList.remove('checked');
+        updateCalculation();
+    }
 
-        navigator.clipboard.writeText(detail).then(() => {
-            alert('估價明細已複製！可以貼給客人囉');
+    function changeQty(item, delta) {
+        state.qty[item] = Math.max(0, state.qty[item] + delta);
+        document.getElementById('qty-' + item).innerText = state.qty[item];
+        updateCalculation();
+    }
+
+    function selectOff(name, price) {
+        state.offService = { name, price };
+        document.querySelectorAll('.section-card:nth-child(5) .option-card').forEach(el => el.classList.remove('selected'));
+        const target = document.getElementById('opt-off-' + name);
+        if(target) target.classList.add('selected');
+
+        updateCalculation();
+    }
+
+    function toggleFiveWeek() {
+        state.isFiveWeek = !state.isFiveWeek;
+        const check = document.getElementById('five-week-check');
+        if(state.isFiveWeek) check.classList.add('checked');
+        else check.classList.remove('checked');
+
+        updateCalculation();
+    }
+
+    function updateCalculation() {
+        let total = 0;
+        let breakdown = [];
+        let copyDetails = [];
+
+        // 1. 主項目計算
+        if(state.mainService) {
+            let baseName = state.mainService.name;
+            let basePrice = state.mainService.price;
+
+            if(baseName === '客帶圖') {
+                const inputVal = parseInt(document.getElementById('custom-price').value) || 0;
+                basePrice = inputVal;
+                baseName = `客帶圖報價 ($${basePrice})`;
+            }
+
+            // 足部加價
+            if(state.isFoot) {
+                baseName = '【足部】' + baseName;
+                basePrice += 100;
+            } else {
+                baseName = '【手部】' + baseName;
+            }
+
+            // 折扣計算
+            if(state.promo === 'opening') {
+                let discountedPrice = Math.round(basePrice * 0.9);
+                total += discountedPrice;
+                breakdown.push(`• ${baseName}：$${discountedPrice} <span style="opacity:0.7;">(原價 $${basePrice} 打 9 折)</span>`);
+                copyDetails.push(`${baseName}：$${discountedPrice} (開幕 9 折優惠，原價 $${basePrice})`);
+            } else if(state.promo === 'handmodel') {
+                let hmPrice = basePrice;
+                let hmText = baseName;
+                
+                if(state.mainService.name === '手模-單色' && state.hmCatEye) {
+                    hmPrice += 100;
+                    hmText += ' + 加購貓眼($100)';
+                }
+                
+                total += hmPrice;
+                breakdown.push(`• ${hmText}：$${hmPrice} (手模優惠價)`);
+                copyDetails.push(`${hmText}：$${hmPrice} (手模快閃早鳥價)`);
+            } else { // 原價
+                total += basePrice;
+                breakdown.push(`• ${baseName}：$${basePrice}`);
+                copyDetails.push(`${baseName}：$${basePrice}`);
+            }
+        }
+
+        // 2. 加購項目
+        const addOns = [
+            { key: 'extension', name: '單指延甲', price: 80, unit: '指' },
+            { key: 'baseColor', name: '底色(整手)', price: 100, unit: '次' },
+            { key: 'repair', name: '補甲(單指)', price: 50, unit: '指' }
+        ];
+
+        addOns.forEach(item => {
+            const count = state.qty[item.key];
+            if(count > 0) {
+                const sum = count * item.price;
+                total += sum;
+                breakdown.push(`• 加購-${item.name} x${count}${item.unit}：$${sum}`);
+                copyDetails.push(`加購-${item.name} x${count}${item.unit}：$${sum}`);
+            }
+        });
+
+        // 3. 卸甲服務
+        if(state.offService && state.offService.name !== '無需卸甲') {
+            let offPrice = state.offService.price;
+            let offName = state.offService.name;
+
+            if(offName === '本店續作' && state.isFiveWeek) {
+                breakdown.push(`• 卸甲-${offName}：$0 <span style="opacity:0.7;">(五週內回店續作免費)</span>`);
+                copyDetails.push(`卸甲-${offName}：$0 (享五週內回店續作免費福利)`);
+            } else {
+                total += offPrice;
+                breakdown.push(`• 卸甲-${offName}：$${offPrice}`);
+                copyDetails.push(`卸甲-${offName}：$${offPrice}`);
+            }
+        }
+
+        // 更新畫面
+        document.getElementById('total-amount').innerText = `$${total.toLocaleString()}`;
+        document.getElementById('breakdown-list').innerHTML = breakdown.join('<br>');
+
+        // 保存複製用文本
+        window.currentCopyText = `【拾初 LUMI 美甲服務預約估價】\n` +
+            `---------------------------\n` +
+            `計價模式：${state.promo === 'opening' ? '開幕 9 折優惠' : (state.promo === 'handmodel' ? '徵手模限定優惠' : '標準原價')}\n` +
+            copyDetails.join('\n') + `\n` +
+            `---------------------------\n` +
+            `💰 預估總金額：$${total.toLocaleString()} 元\n\n` +
+            `※ 實際施作時間與最終金額以現場溝通評估為準。`;
+    }
+
+    function copyDetail() {
+        if(!window.currentCopyText) return;
+        
+        navigator.clipboard.writeText(window.currentCopyText).then(() => {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }).catch(err => {
+            alert('複製失敗，請手動複製');
         });
     }
+
+    // 初始化
+    selectMain('單色', 700);
+    selectOff('none', 0);
 </script>
 
 </body>
