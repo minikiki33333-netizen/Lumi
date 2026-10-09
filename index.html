@@ -75,23 +75,23 @@
     /* 頂部 Mode 切換鈕 */
     .mode-group {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 12px;
     }
 
     .mode-btn {
       flex: 1;
-      padding: 10px 4px;
+      padding: 10px 2px;
       border: 1px solid var(--card-border);
       border-radius: 20px;
       background: #fff;
       color: var(--text-dark);
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
       transition: all 0.2s;
     }
 
@@ -106,7 +106,7 @@
       font-size: 10px;
       background: var(--badge-bg);
       color: var(--badge-text);
-      padding: 1px 6px;
+      padding: 1px 5px;
       border-radius: 10px;
     }
 
@@ -125,12 +125,6 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
     }
 
     .style-item {
@@ -194,7 +188,6 @@
       outline: none;
     }
 
-    /* Checkbox & Radio 行樣式 */
     .checkbox-row {
       display: flex;
       align-items: center;
@@ -291,6 +284,11 @@
       color: var(--text-dark);
     }
 
+    .off-unit-note {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
     /* 底部卡片 */
     .footer-card {
       position: fixed;
@@ -358,23 +356,23 @@
     <p>NAIL STUDIO 預約服務估價</p>
   </div>
 
-  <!-- 1. 計算模式 / 活動選擇 -->
+  <!-- 1. 客類 / 活動選擇 -->
   <div class="card">
-    <div class="card-title">✦ 選擇計算模式 / 活動</div>
+    <div class="card-title">✦ 選擇模式 / 活動</div>
     <div class="mode-group">
       <button class="mode-btn active" id="btn-mode-new" onclick="setMode('new')">
-        開幕 9 折 <span class="badge">優惠</span>
+        新客原價
       </button>
-      <button class="mode-btn" id="btn-mode-model" onclick="setMode('model')">
-        徵手模 <span class="badge">限量</span>
+      <button class="mode-btn" id="btn-mode-promo" onclick="setMode('promo')">
+        新客活動 <span class="badge">-200</span>
       </button>
       <button class="mode-btn" id="btn-mode-old" onclick="setMode('old')">
-        原價計算
+        舊客優惠 <span class="badge">專屬</span>
       </button>
     </div>
 
     <div class="banner-desc" id="banner-desc">
-      原價計算模式：估價目標表單金額計算。
+      🌸 <b>新客價目</b>：標準新客價目表金額計算。
     </div>
   </div>
 
@@ -442,15 +440,18 @@
       </div>
       <div class="off-item" id="off-self" onclick="setOffType('self')">
         <div>本店續作</div>
-        <div class="off-price" id="off-self-price">$100</div>
+        <div class="off-price">$100 <span class="off-unit-note">(全手)</span></div>
+        <div class="off-unit-note">單指 $10</div>
       </div>
       <div class="off-item" id="off-other" onclick="setOffType('other')">
         <div>他店續作</div>
-        <div class="off-price" id="off-other-price">$200</div>
+        <div class="off-price">$200 <span class="off-unit-note">(全手)</span></div>
+        <div class="off-unit-note">單指 $20</div>
       </div>
       <div class="off-item" id="off-only" onclick="setOffType('only')">
         <div>本店不續作</div>
-        <div class="off-price" id="off-only-price">$300</div>
+        <div class="off-price">$300 <span class="off-unit-note">(全手)</span></div>
+        <div class="off-unit-note">單指 $30</div>
       </div>
     </div>
 
@@ -458,7 +459,7 @@
     <div id="off-finger-ctrl" class="counter-row" style="margin-top: 12px; display: none;">
       <div>
         <div class="counter-title">卸甲指頭數量</div>
-        <div class="counter-sub">預設全手 10 指</div>
+        <div class="counter-sub" id="off-finger-desc">預設全手 10 指</div>
       </div>
       <div class="counter-ctrl">
         <button class="counter-btn" onclick="addCount('offFinger', -1)">-</button>
@@ -482,14 +483,14 @@
 
     <div class="summary-list" id="summary-text">
       • 【手部】單色：$700<br>
-      • 卸甲-none：$0
+      • 卸甲：無
     </div>
 
     <button class="copy-btn-large" onclick="copyResult()">一鍵複製預約明細</button>
   </div>
 
   <script>
-    let currentMode = 'new'; // 'new', 'model', 'old'
+    let currentMode = 'new'; // 'new', 'promo', 'old'
     let selectedStyle = 'single';
     let countExt = 0;
     let countBase = 0;
@@ -500,16 +501,16 @@
     function setMode(mode) {
       currentMode = mode;
       document.getElementById('btn-mode-new').classList.toggle('active', mode === 'new');
-      document.getElementById('btn-mode-model').classList.toggle('active', mode === 'model');
+      document.getElementById('btn-mode-promo').classList.toggle('active', mode === 'promo');
       document.getElementById('btn-mode-old').classList.toggle('active', mode === 'old');
 
       const desc = document.getElementById('banner-desc');
       if (mode === 'new') {
-        desc.innerHTML = '🌸 <b>開幕優惠活動中</b>：手部凝膠與自帶圖款式享 <b>9 折優惠</b>！加購及卸甲不參與折扣。';
-      } else if (mode === 'model') {
-        desc.innerHTML = '🌸 <b>微手模快閃早鳥優惠</b>（限前 10 名）：單色 $490 / 款式 $790，優惠不受原價影響，不得與 9 折併用。';
+        desc.innerHTML = '🌸 <b>新客價目</b>：標準新客價目表金額計算。';
+      } else if (mode === 'promo') {
+        desc.innerHTML = '🎉 <b>新客限時活動</b>：新客款式項目可享 <b>折折 $200 元</b> 優惠！';
       } else {
-        desc.innerHTML = '原價計算模式：估價目標表單金額計算。';
+        desc.innerHTML = '💖 <b>舊客專屬優惠價</b>：單色 $490 / 貓眼·碎鑽·漸層·鏡面 $690 / 款式 $990 up。';
       }
 
       renderStyles();
@@ -520,28 +521,19 @@
       const container = document.getElementById('style-container');
       container.innerHTML = '';
 
-      if (currentMode === 'model') {
-        // 微手模專用兩款
-        if (selectedStyle !== 'model_single' && selectedStyle !== 'model_style') {
-          selectedStyle = 'model_single';
-        }
-        container.innerHTML = `
-          <div class="style-item ${selectedStyle === 'model_single' ? 'active' : ''}" onclick="selectStyle('model_single')">
-            <div class="style-name">手模 - 單色</div>
-            <div class="style-price">$490</div>
-          </div>
-          <div class="style-item ${selectedStyle === 'model_style' ? 'active' : ''}" onclick="selectStyle('model_style')">
-            <div class="style-name">手模 - 款式</div>
-            <div class="style-price">$790</div>
-          </div>
-        `;
-      } else {
-        // 9折與原價模式的 6 大款式
-        if (selectedStyle === 'model_single' || selectedStyle === 'model_style') {
-          selectedStyle = 'single';
-        }
+      let styles = [];
 
-        const styles = [
+      if (currentMode === 'old') {
+        styles = [
+          { id: 'single', name: '單色', price: 490, sub: '純色 / 可跳一色' },
+          { id: 'cat', name: '貓眼', price: 690 },
+          { id: 'diamond', name: '碎鑽', price: 690 },
+          { id: 'gradient', name: '漸層', price: 690 },
+          { id: 'mirror', name: '鏡面', price: 690 },
+          { id: 'french', name: '法式', price: 1000 }
+        ];
+      } else {
+        styles = [
           { id: 'single', name: '單色', price: 700, sub: '純色 / 可跳一色' },
           { id: 'cat', name: '貓眼', price: 800 },
           { id: 'diamond', name: '碎鑽', price: 800 },
@@ -549,28 +541,35 @@
           { id: 'mirror', name: '鏡面', price: 900 },
           { id: 'french', name: '法式', price: 1000 }
         ];
+      }
 
-        styles.forEach(s => {
-          let displayPrice = currentMode === 'new' ? Math.round(s.price * 0.9) : s.price;
-          container.innerHTML += `
-            <div class="style-item ${selectedStyle === s.id ? 'active' : ''}" onclick="selectStyle('${s.id}')">
-              <div class="style-name">${s.name}</div>
-              <div class="style-price">$${displayPrice}</div>
-              ${s.sub ? `<div class="style-sub">${s.sub}</div>` : ''}
-            </div>
-          `;
-        });
+      styles.forEach(s => {
+        let displayPrice = s.price;
+        if (currentMode === 'promo') {
+          displayPrice = Math.max(0, s.price - 200);
+        }
 
         container.innerHTML += `
-          <div class="custom-input-box ${selectedStyle === 'custom' ? 'active' : ''}" onclick="selectStyle('custom')">
-            <div class="style-name">客帶圖報價 ($1,000 up)</div>
-            <div style="font-size:12px; color:var(--text-muted);">
-              點擊輸入美甲師報價金額：$
-              <input type="number" id="custom-val" class="custom-input" value="1000" step="50" oninput="calculate()">
-            </div>
+          <div class="style-item ${selectedStyle === s.id ? 'active' : ''}" onclick="selectStyle('${s.id}')">
+            <div class="style-name">${s.name}</div>
+            <div class="style-price">$${displayPrice}</div>
+            ${s.sub ? `<div class="style-sub">${s.sub}</div>` : ''}
           </div>
         `;
-      }
+      });
+
+      let defaultCustom = currentMode === 'old' ? 990 : 1000;
+      let customLabel = currentMode === 'old' ? '款式/自帶圖 ($990 up)' : '客帶圖報價 ($1,000 up)';
+
+      container.innerHTML += `
+        <div class="custom-input-box ${selectedStyle === 'custom' ? 'active' : ''}" onclick="selectStyle('custom')">
+          <div class="style-name">${customLabel}</div>
+          <div style="font-size:12px; color:var(--text-muted);">
+            點擊輸入美甲師報價金額：$
+            <input type="number" id="custom-val" class="custom-input" value="${defaultCustom}" step="50" oninput="calculate()">
+          </div>
+        </div>
+      `;
     }
 
     function selectStyle(id) {
@@ -619,31 +618,30 @@
       let styleName = '';
       let stylePrice = 0;
 
-      if (currentMode === 'model') {
-        if (selectedStyle === 'model_single') { styleName = '手模 - 單色'; stylePrice = 490; }
-        else { styleName = '手模 - 款式'; stylePrice = 790; }
-        total += stylePrice + locAdd;
-        summary.push(`• 【${locText}】${styleName}：$${stylePrice + locAdd}`);
+      if (selectedStyle === 'custom') {
+        styleName = currentMode === 'old' ? '款式/自帶圖' : '客帶圖報價';
+        stylePrice = Number(document.getElementById('custom-val').value) || 0;
       } else {
-        const rawPrices = { single: 700, cat: 800, diamond: 800, gradient: 900, mirror: 900, french: 1000 };
-        if (selectedStyle === 'custom') {
-          styleName = '客帶圖報價';
-          stylePrice = Number(document.getElementById('custom-val').value) || 0;
-        } else {
-          const names = { single: '單色', cat: '貓眼', diamond: '碎鑽', gradient: '漸層', mirror: '鏡面', french: '法式' };
-          styleName = names[selectedStyle];
-          stylePrice = rawPrices[selectedStyle];
-        }
+        const names = { single: '單色', cat: '貓眼', diamond: '碎鑽', gradient: '漸層', mirror: '鏡面', french: '法式' };
+        styleName = names[selectedStyle];
 
-        let finalStylePrice = stylePrice;
-        if (currentMode === 'new') {
-          finalStylePrice = Math.round(stylePrice * 0.9);
-          total += finalStylePrice + locAdd;
-          summary.push(`• 【${locText}】${styleName}：$${finalStylePrice + locAdd} <span style="color:#e2a599;">(原價 $${stylePrice} 享 9 折)</span>`);
+        if (currentMode === 'old') {
+          const oldPrices = { single: 490, cat: 690, diamond: 690, gradient: 690, mirror: 690, french: 1000 };
+          stylePrice = oldPrices[selectedStyle];
         } else {
-          total += finalStylePrice + locAdd;
-          summary.push(`• 【${locText}】${styleName}：$${finalStylePrice + locAdd}`);
+          const newPrices = { single: 700, cat: 800, diamond: 800, gradient: 900, mirror: 900, french: 1000 };
+          stylePrice = newPrices[selectedStyle];
         }
+      }
+
+      let finalStylePrice = stylePrice;
+      if (currentMode === 'promo') {
+        finalStylePrice = Math.max(0, stylePrice - 200);
+        total += finalStylePrice + locAdd;
+        summary.push(`• 【${locText}】${styleName}：$${finalStylePrice + locAdd} <span style="color:#e2a599;">(新客活動折$200)</span>`);
+      } else {
+        total += finalStylePrice + locAdd;
+        summary.push(`• 【${locText}】${styleName}：$${finalStylePrice + locAdd}`);
       }
 
       // 3. 加購項目
@@ -660,7 +658,7 @@
         summary.push(`• 補甲 x${countRepair}：+$${countRepair * 50}`);
       }
 
-      // 4. 卸甲計算
+      // 4. 卸甲計算 (全手基準 + 單指微調)
       let offUnitPrice = 0;
       let offName = '';
       if (selectedOff === 'self') { offUnitPrice = 10; offName = '本店續作'; }
@@ -668,15 +666,19 @@
       else if (selectedOff === 'only') { offUnitPrice = 30; offName = '本店不續作'; }
 
       if (selectedOff === 'none') {
-        summary.push(`• 卸甲-none：$0`);
+        summary.push(`• 卸甲：無`);
       } else {
         const is5w = document.getElementById('chk-5w').checked;
         if (selectedOff === 'self' && is5w) {
-          summary.push(`• 卸甲-本店續作 (符合五週福利)：$0`);
+          summary.push(`• 卸甲-本店續作 (五週福利)：$0`);
         } else {
           let offTotal = offUnitPrice * countOffFinger;
           total += offTotal;
-          summary.push(`• 卸甲-${offName} (${countOffFinger}指)：+$${offTotal}`);
+          if (countOffFinger === 10) {
+            summary.push(`• 卸甲-${offName} (全手10指)：+$${offTotal}`);
+          } else {
+            summary.push(`• 卸甲-${offName} (${countOffFinger}指, $${offUnitPrice}/指)：+$${offTotal}`);
+          }
         }
       }
 
