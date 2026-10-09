@@ -188,4 +188,372 @@
     .sub-title {
       font-size: 13px;
       color: var(--text-light);
-      margin-bottom: 8px
+      margin-bottom: 8px;
+    }
+
+    .promo-card {
+      background: #fdf6f5;
+      border: 1px solid var(--accent);
+    }
+
+    .footer-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border);
+      padding: 12px 20px;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 500px;
+      margin: 0 auto;
+      z-index: 100;
+    }
+
+    .total-price {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .copy-btn {
+      background: var(--primary-dark);
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .copy-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>拾初 LUMI</h1>
+    <p>用心打造屬於你的指尖美感</p>
+  </div>
+
+  <!-- 客人身份切換 -->
+  <div class="tab-container">
+    <button class="tab-btn active" id="tab-new" onclick="setCustomerType('new')">新客</button>
+    <button class="tab-btn" id="tab-old" onclick="setCustomerType('old')">舊客</button>
+  </div>
+
+  <!-- 1. 主款式選擇 -->
+  <div class="card">
+    <div class="card-title">手部凝膠主款式</div>
+    <div class="radio-group">
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="style" value="none" checked onchange="calculate()">
+          <span>不施作 / 僅加購或卸甲</span>
+        </div>
+        <span class="price">$0</span>
+      </label>
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="style" value="single" onchange="calculate()">
+          <span>單色（純色 / 可跳一色）</span>
+        </div>
+        <span class="price" id="price-single">$700</span>
+      </label>
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="style" value="cat_eye" onchange="calculate()">
+          <span>貓眼 / 碎鑽 / 漸層 / 鏡面</span>
+        </div>
+        <span class="price" id="price-cat">$800</span>
+      </label>
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="style" value="french" onchange="calculate()">
+          <span>法式</span>
+        </div>
+        <span class="price" id="price-french">$1000</span>
+      </label>
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="style" value="custom" onchange="calculate()">
+          <span>自帶圖 / 造型款式</span>
+        </div>
+        <div>
+          $<input type="number" id="custom-price-input" class="custom-price-input" value="1000" min="0" step="50" oninput="calculate()">
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <!-- 2. 位置選擇 -->
+  <div class="card">
+    <div class="card-title">施作部位</div>
+    <div class="radio-group">
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="location" value="hand" checked onchange="calculate()">
+          <span>手部項目</span>
+        </div>
+        <span class="price">+$0</span>
+      </label>
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="location" value="foot" onchange="calculate()">
+          <span>足部項目加價</span>
+        </div>
+        <span class="price">+$100</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- 3. 加購項目 -->
+  <div class="card">
+    <div class="card-title">加購服務</div>
+    <div class="checkbox-group">
+      <label class="option-label">
+        <div class="option-info">
+          <input type="checkbox" id="add-base" onchange="calculate()">
+          <span>底色（整手）</span>
+        </div>
+        <span class="price">+$100</span>
+      </label>
+      
+      <div class="counter-group">
+        <span>單指延甲 ($80/指)</span>
+        <div class="counter-ctrl">
+          <button class="counter-btn" onclick="updateCount('ext', -1)">-</button>
+          <span id="count-ext">0</span>
+          <button class="counter-btn" onclick="updateCount('ext', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="counter-group">
+        <span>補甲 ($50/指)</span>
+        <div class="counter-ctrl">
+          <button class="counter-btn" onclick="updateCount('repair', -1)">-</button>
+          <span id="count-repair">0</span>
+          <button class="counter-btn" onclick="updateCount('repair', 1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 卸甲服務 -->
+  <div class="card">
+    <div class="card-title">卸甲服務</div>
+    <div class="radio-group">
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="off_type" value="none" checked onchange="calculate()">
+          <span>不卸甲</span>
+        </div>
+        <span class="price">$0</span>
+      </label>
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="off_type" value="free_5w" onchange="calculate()">
+          <span>五週內回來卸甲續作</span>
+        </div>
+        <span class="price">$0</span>
+      </label>
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="off_type" value="self_renew" onchange="calculate()">
+          <span>本店卸甲 + 續作 ($10/指, 整手 $100)</span>
+        </div>
+      </label>
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="off_type" value="other_renew" onchange="calculate()">
+          <span>他店卸甲 + 續作 ($20/指, 整手 $200)</span>
+        </div>
+      </label>
+      <label class="option-label">
+        <div class="option-info">
+          <input type="radio" name="off_type" value="self_only" onchange="calculate()">
+          <span>本店卸甲不續作 ($30/指, 整手 $300)</span>
+        </div>
+      </label>
+    </div>
+
+    <div class="sub-section" id="off-finger-section" style="display: none;">
+      <div class="sub-title">卸甲數量設定（預設全手 10 指）：</div>
+      <div class="counter-group">
+        <span id="off-finger-label">卸甲指數</span>
+        <div class="counter-ctrl">
+          <button class="counter-btn" onclick="updateCount('off', -1)">-</button>
+          <span id="count-off">10</span>
+          <button class="counter-btn" onclick="updateCount('off', 1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 新客優惠專區 -->
+  <div class="card promo-card" id="promo-card">
+    <div class="card-title">新客專屬優惠 🌸</div>
+    <label class="option-label" style="border: none; padding: 0;">
+      <div class="option-info">
+        <input type="checkbox" id="promo-200" onchange="calculate()">
+        <span>新客首次體驗折 $200 元</span>
+      </div>
+      <span class="price" style="color: var(--accent);">- $200</span>
+    </label>
+  </div>
+
+  <!-- 底部固定結帳列 -->
+  <div class="footer-bar">
+    <div>
+      <div style="font-size: 12px; color: var(--text-light);">預估總金額</div>
+      <div class="total-price" id="total-display">$0</div>
+    </div>
+    <button class="copy-btn" onclick="copyDetail()">複製報價明細</button>
+  </div>
+
+  <script>
+    let currentType = 'new'; 
+    let countExt = 0;
+    let countRepair = 0;
+    let countOff = 10;
+
+    function setCustomerType(type) {
+      currentType = type;
+      document.getElementById('tab-new').classList.toggle('active', type === 'new');
+      document.getElementById('tab-old').classList.toggle('active', type === 'old');
+
+      document.getElementById('promo-card').style.display = type === 'new' ? 'block' : 'none';
+      if (type === 'old') {
+        document.getElementById('promo-200').checked = false;
+      }
+
+      const customInput = document.getElementById('custom-price-input');
+      if (type === 'new') {
+        document.getElementById('price-single').innerText = '$700';
+        document.getElementById('price-cat').innerText = '$800~$900';
+        document.getElementById('price-french').innerText = '$1000';
+        if (customInput.value === '990') customInput.value = '1000';
+      } else {
+        document.getElementById('price-single').innerText = '$490';
+        document.getElementById('price-cat').innerText = '$690';
+        document.getElementById('price-french').innerText = '$1000';
+        if (customInput.value === '1000') customInput.value = '990';
+      }
+
+      calculate();
+    }
+
+    function updateCount(type, val) {
+      if (type === 'ext') {
+        countExt = Math.max(0, countExt + val);
+        document.getElementById('count-ext').innerText = countExt;
+      } else if (type === 'repair') {
+        countRepair = Math.max(0, countRepair + val);
+        document.getElementById('count-repair').innerText = countRepair;
+      } else if (type === 'off') {
+        countOff = Math.min(10, Math.max(1, countOff + val));
+        document.getElementById('count-off').innerText = countOff;
+      }
+      calculate();
+    }
+
+    function calculate() {
+      let total = 0;
+
+      const style = document.querySelector('input[name="style"]:checked').value;
+      if (style === 'single') {
+        total += currentType === 'new' ? 700 : 490;
+      } else if (style === 'cat_eye') {
+        total += currentType === 'new' ? 800 : 690;
+      } else if (style === 'french') {
+        total += 1000;
+      } else if (style === 'custom') {
+        total += Number(document.getElementById('custom-price-input').value) || 0;
+      }
+
+      const location = document.querySelector('input[name="location"]:checked').value;
+      if (location === 'foot') total += 100;
+
+      if (document.getElementById('add-base').checked) total += 100;
+      total += countExt * 80;
+      total += countRepair * 50;
+
+      const offType = document.querySelector('input[name="off_type"]:checked').value;
+      const offSection = document.getElementById('off-finger-section');
+      
+      let offUnitPrice = 0;
+      if (offType === 'self_renew') offUnitPrice = 10;
+      else if (offType === 'other_renew') offUnitPrice = 20;
+      else if (offType === 'self_only') offUnitPrice = 30;
+
+      if (offUnitPrice > 0) {
+        offSection.style.display = 'block';
+        total += offUnitPrice * countOff;
+      } else {
+        offSection.style.display = 'none';
+      }
+
+      if (currentType === 'new' && document.getElementById('promo-200').checked) {
+        total -= 200;
+      }
+
+      document.getElementById('total-display').innerText = '$' + Math.max(0, total);
+    }
+
+    function copyDetail() {
+      let details = [];
+      details.push(`🌸 拾初 LUMI 服務計費明細 🌸`);
+      details.push(`------------------------`);
+      details.push(`身份：${currentType === 'new' ? '新客' : '舊客'}`);
+
+      const styleVal = document.querySelector('input[name="style"]:checked').value;
+      if (styleVal === 'single') details.push(`款式：單色 $${currentType === 'new' ? 700 : 490}`);
+      else if (styleVal === 'cat_eye') details.push(`款式：造型/貓眼 $${currentType === 'new' ? 800 : 690}`);
+      else if (styleVal === 'french') details.push(`款式：法式 $1000`);
+      else if (styleVal === 'custom') details.push(`款式：自帶圖/款式 $${document.getElementById('custom-price-input').value}`);
+
+      const locVal = document.querySelector('input[name="location"]:checked').value;
+      if (locVal === 'foot') details.push(`部位：足部加價 +$100`);
+
+      let adds = [];
+      if (document.getElementById('add-base').checked) adds.push('底色+$100');
+      if (countExt > 0) adds.push(`延甲x${countExt} +$${countExt * 80}`);
+      if (countRepair > 0) adds.push(`補甲x${countRepair} +$${countRepair * 50}`);
+      if (adds.length > 0) details.push(`加購：${adds.join('、')}`);
+
+      const offType = document.querySelector('input[name="off_type"]:checked').value;
+      if (offType === 'free_5w') {
+        details.push(`卸甲：五週內續作 $0`);
+      } else if (offType === 'self_renew') {
+        details.push(`卸甲：本店卸甲續作 (${countOff}指) +$${countOff * 10}`);
+      } else if (offType === 'other_renew') {
+        details.push(`卸甲：他店卸甲續作 (${countOff}指) +$${countOff * 20}`);
+      } else if (offType === 'self_only') {
+        details.push(`卸甲：本店卸甲不續作 (${countOff}指) +$${countOff * 30}`);
+      }
+
+      if (currentType === 'new' && document.getElementById('promo-200').checked) {
+        details.push(`優惠：新客體驗折扣 -$200`);
+      }
+
+      details.push(`------------------------`);
+      details.push(`預估總金額：${document.getElementById('total-display').innerText}`);
+
+      navigator.clipboard.writeText(details.join('\n')).then(() => {
+        alert('報價明細已成功複製！可以貼給客人囉！');
+      }).catch(err => {
+        alert('複製失敗，請手動複製明細。');
+      });
+    }
+
+    calculate();
+  </script>
+</body>
+</html>
