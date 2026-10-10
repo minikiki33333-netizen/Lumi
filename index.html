@@ -28,7 +28,7 @@
     body {
       background-color: var(--bg-color);
       color: var(--text-dark);
-      padding: 20px 15px 220px; /* 增加底部留白，避免底部卡片遮擋內容 */
+      padding: 20px 15px 220px;
       max-width: 480px;
       margin: 0 auto;
     }
@@ -179,14 +179,15 @@
     .custom-input {
       width: 90px;
       border: none;
-      border-bottom: 1.5px solid var(--primary);
-      background: transparent;
+      border-bottom: 2px solid var(--primary);
+      background: #fff;
       text-align: center;
       font-size: 16px;
       font-weight: bold;
       color: var(--primary-dark);
       outline: none;
       padding: 2px 4px;
+      border-radius: 4px;
     }
 
     .checkbox-row {
@@ -253,18 +254,6 @@
       font-weight: 600;
       min-width: 16px;
       text-align: center;
-    }
-
-    .inline-input {
-      width: 50px;
-      border: none;
-      border-bottom: 1px solid var(--primary);
-      text-align: center;
-      font-size: 13px;
-      font-weight: bold;
-      color: var(--primary-dark);
-      outline: none;
-      background: transparent;
     }
 
     /* 卸甲選擇 */
@@ -469,28 +458,16 @@
       </div>
     </div>
 
-    <!-- 單指卸甲可自訂調整區 -->
-    <div id="off-finger-ctrl" style="margin-top: 12px; display: none;">
-      <div class="counter-row">
-        <div>
-          <div class="counter-title">卸甲指頭數量</div>
-          <div class="counter-sub">預設全手 10 指</div>
-        </div>
-        <div class="counter-ctrl">
-          <button class="counter-btn" onclick="addCount('offFinger', -1)">-</button>
-          <span class="counter-num" id="num-offFinger">10</span>
-          <button class="counter-btn" onclick="addCount('offFinger', 1)">+</button>
-        </div>
+    <!-- 卸甲指頭數量選單 -->
+    <div id="off-finger-ctrl" class="counter-row" style="margin-top: 12px; display: none;">
+      <div>
+        <div class="counter-title">卸甲指頭數量</div>
+        <div class="counter-sub">預設全手 10 指 (按 - 扣至實際指數)</div>
       </div>
-
-      <div class="counter-row">
-        <div>
-          <div class="counter-title">單指卸甲自訂金額</div>
-          <div class="counter-sub">可自訂每指單價</div>
-        </div>
-        <div>
-          $ <input type="number" id="off-custom-rate" class="inline-input" value="10" oninput="calculate()"> / 指
-        </div>
+      <div class="counter-ctrl">
+        <button class="counter-btn" onclick="addCount('offFinger', -1)">-</button>
+        <span class="counter-num" id="num-offFinger">10</span>
+        <button class="counter-btn" onclick="addCount('offFinger', 1)">+</button>
       </div>
     </div>
 
@@ -534,7 +511,7 @@
       if (mode === 'new') {
         desc.innerHTML = '🌸 <b>新客價目</b>：標準新客價目表金額計算。';
       } else if (mode === 'promo') {
-        desc.innerHTML = '🎉 <b>新客限時活動</b>：新客所有款式與帶圖項目皆可享 <b>折 $200 元</b> 優惠！';
+        desc.innerHTML = '🎉 <b>新客限時活動</b>：新客所有款式與帶圖項目皆已自動為您 <b>折抵 $200 元</b>！';
       } else {
         desc.innerHTML = '💖 <b>舊客專屬優惠價</b>：單色 $490 / 貓眼·碎鑽·漸層·鏡面 $690 / 款式 $990 up。';
       }
@@ -584,16 +561,19 @@
         `;
       });
 
-      let defaultCustom = currentMode === 'old' ? 990 : 1000;
+      // 帶圖款金額預設值
+      let defaultCustom = 1000;
+      if (currentMode === 'promo') defaultCustom = 800; // 新客活動直接帶入扣折後的 800
+      else if (currentMode === 'old') defaultCustom = 990;
+
       let customLabel = currentMode === 'old' ? '款式/自帶圖 ($990 up)' : '客帶圖報價 ($1,000 up)';
 
       container.innerHTML += `
         <div class="custom-input-box ${selectedStyle === 'custom' ? 'active' : ''}" onclick="selectStyle('custom')">
           <div class="style-name">${customLabel}</div>
-          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;" onclick="event.stopPropagation(); selectStyle('custom');">
-            金額：$
-            <input type="number" id="custom-val" class="custom-input" value="${defaultCustom}" step="50" oninput="calculate()">
-            ${currentMode === 'promo' ? '<span style="color:#c85a54; font-size:11px;"> (新客活動自動扣折 $200)</span>' : ''}
+          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+            報價金額：$
+            <input type="number" id="custom-val" class="custom-input" value="${defaultCustom}" step="50" onclick="event.stopPropagation(); selectStyle('custom');" oninput="calculate()">
           </div>
         </div>
       `;
@@ -628,12 +608,7 @@
         document.getElementById(`off-${t}`).classList.toggle('active', t === type);
       });
 
-      const rateInput = document.getElementById('off-custom-rate');
-      if (type === 'self') rateInput.value = 10;
-      else if (type === 'other') rateInput.value = 20;
-      else if (type === 'only') rateInput.value = 30;
-
-      document.getElementById('off-finger-ctrl').style.display = (type !== 'none') ? 'block' : 'none';
+      document.getElementById('off-finger-ctrl').style.display = (type !== 'none') ? 'flex' : 'none';
       calculate();
     }
 
@@ -667,14 +642,12 @@
       }
 
       let finalStylePrice = stylePrice;
-      if (currentMode === 'promo') {
+      if (currentMode === 'promo' && selectedStyle !== 'custom') {
         finalStylePrice = Math.max(0, stylePrice - 200);
-        total += finalStylePrice + locAdd;
-        summary.push(`• 【${locText}】${styleName}：$${finalStylePrice + locAdd} <span style="color:#e2a599;">(原 $${stylePrice} 折$200)</span>`);
-      } else {
-        total += finalStylePrice + locAdd;
-        summary.push(`• 【${locText}】${styleName}：$${finalStylePrice + locAdd}`);
       }
+
+      total += finalStylePrice + locAdd;
+      summary.push(`• 【${locText}】${styleName}：$${finalStylePrice + locAdd}`);
 
       // 3. 加購項目
       if (countExt > 0) {
@@ -690,7 +663,13 @@
         summary.push(`• 補甲 x${countRepair}：+$${countRepair * 50}`);
       }
 
-      // 4. 卸甲計算 (可自訂單指金額與指數)
+      // 4. 卸甲計算
+      let offUnitPrice = 0;
+      let offName = '';
+      if (selectedOff === 'self') { offUnitPrice = 10; offName = '本店續作'; }
+      else if (selectedOff === 'other') { offUnitPrice = 20; offName = '他店續作'; }
+      else if (selectedOff === 'only') { offUnitPrice = 30; offName = '本店不續作'; }
+
       if (selectedOff === 'none') {
         summary.push(`• 卸甲：無`);
       } else {
@@ -698,17 +677,12 @@
         if (selectedOff === 'self' && is5w) {
           summary.push(`• 卸甲-本店續作 (五週福利)：$0`);
         } else {
-          let customRate = Number(document.getElementById('off-custom-rate').value) || 0;
-          let offTotal = customRate * countOffFinger;
+          let offTotal = offUnitPrice * countOffFinger;
           total += offTotal;
-
-          let offNameMap = { self: '本店續作', other: '他店續作', only: '本店不續作' };
-          let offName = offNameMap[selectedOff] || '自訂卸甲';
-
-          if (countOffFinger === 10 && ((selectedOff === 'self' && customRate === 10) || (selectedOff === 'other' && customRate === 20) || (selectedOff === 'only' && customRate === 30))) {
+          if (countOffFinger === 10) {
             summary.push(`• 卸甲-${offName} (全手)：+$${offTotal}`);
           } else {
-            summary.push(`• 卸甲-${offName} (${countOffFinger}指, $${customRate}/指)：+$${offTotal}`);
+            summary.push(`• 卸甲-${offName} (${countOffFinger}指, $${offUnitPrice}/指)：+$${offTotal}`);
           }
         }
       }
