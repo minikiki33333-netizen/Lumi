@@ -11,7 +11,6 @@
       --card-border: #e8ded5;
       --primary: #9e7a63;
       --primary-dark: #7a5c48;
-      --accent-red: #c85a54;
       --text-dark: #4a4039;
       --text-muted: #8c7e75;
       --badge-bg: #edd8cb;
@@ -72,7 +71,7 @@
       gap: 6px;
     }
 
-    /* 頂部 Mode 切換鈕 */
+    /* Mode 切換鈕 */
     .mode-group {
       display: flex;
       gap: 6px;
@@ -174,19 +173,21 @@
     .custom-input-box.active {
       border-color: var(--primary);
       background: #f7f0e9;
+      box-shadow: 0 0 0 1px var(--primary);
     }
 
     .custom-input {
-      width: 90px;
+      width: 110px;
       border: none;
       border-bottom: 2px solid var(--primary);
       background: #fff;
       text-align: center;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: bold;
       color: var(--primary-dark);
       outline: none;
-      padding: 2px 4px;
+      padding: 4px;
+      margin-left: 4px;
       border-radius: 4px;
     }
 
@@ -206,7 +207,7 @@
       height: 16px;
     }
 
-    /* 加購與數量微調列 */
+    /* 加購與數量列 */
     .counter-row {
       display: flex;
       align-items: center;
@@ -291,7 +292,7 @@
       color: var(--text-muted);
     }
 
-    /* 底部卡片 */
+    /* 底部固定卡片 */
     .footer-card {
       position: fixed;
       bottom: 0;
@@ -344,7 +345,6 @@
       font-size: 14px;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.2s;
     }
 
     .copy-btn-large:active {
@@ -382,8 +382,41 @@
   <!-- 2. 款式選擇 -->
   <div class="card">
     <div class="card-title">✦ 款式選擇</div>
-    <div id="style-container" class="grid-2">
-      <!-- 動態載入款式卡片 -->
+    <div class="grid-2">
+      <div class="style-item active" id="style-single" onclick="selectStyle('single')">
+        <div class="style-name">單色</div>
+        <div class="style-price" id="p-single">$700</div>
+        <div class="style-sub">純色 / 可跳一色</div>
+      </div>
+      <div class="style-item" id="style-cat" onclick="selectStyle('cat')">
+        <div class="style-name">貓眼</div>
+        <div class="style-price" id="p-cat">$800</div>
+      </div>
+      <div class="style-item" id="style-diamond" onclick="selectStyle('diamond')">
+        <div class="style-name">碎鑽</div>
+        <div class="style-price" id="p-diamond">$800</div>
+      </div>
+      <div class="style-item" id="style-gradient" onclick="selectStyle('gradient')">
+        <div class="style-name">漸層</div>
+        <div class="style-price" id="p-gradient">$900</div>
+      </div>
+      <div class="style-item" id="style-mirror" onclick="selectStyle('mirror')">
+        <div class="style-name">鏡面</div>
+        <div class="style-price" id="p-mirror">$900</div>
+      </div>
+      <div class="style-item" id="style-french" onclick="selectStyle('french')">
+        <div class="style-name">法式</div>
+        <div class="style-price" id="p-french">$1000</div>
+      </div>
+
+      <!-- 帶圖報價卡片 (獨立文字輸入框) -->
+      <div class="custom-input-box" id="style-custom" onclick="selectStyle('custom')">
+        <div class="style-name" id="custom-title-label">客帶圖報價 ($1,000 up)</div>
+        <div style="font-size:13px; color:var(--text-dark); margin-top:6px;">
+          報價金額：$
+          <input type="number" id="custom-val" class="custom-input" value="1000" step="50" onclick="event.stopPropagation(); selectStyle('custom');" oninput="calculate()">
+        </div>
+      </div>
     </div>
 
     <label class="checkbox-row" style="margin-top: 15px;">
@@ -508,80 +541,45 @@
       document.getElementById('btn-mode-old').classList.toggle('active', mode === 'old');
 
       const desc = document.getElementById('banner-desc');
+      const customInput = document.getElementById('custom-val');
+      const customTitle = document.getElementById('custom-title-label');
+
       if (mode === 'new') {
         desc.innerHTML = '🌸 <b>新客價目</b>：標準新客價目表金額計算。';
+        customTitle.innerText = '客帶圖報價 ($1,000 up)';
+        customInput.value = 1000;
+        updatePrices({ single: 700, cat: 800, diamond: 800, gradient: 900, mirror: 900, french: 1000 });
       } else if (mode === 'promo') {
         desc.innerHTML = '🎉 <b>新客限時活動</b>：新客所有款式與帶圖項目皆已自動為您 <b>折抵 $200 元</b>！';
+        customTitle.innerText = '客帶圖報價 (折抵$200優惠中)';
+        customInput.value = 800; // 直接自動帶入折抵後的 $800
+        updatePrices({ single: 500, cat: 600, diamond: 600, gradient: 700, mirror: 700, french: 800 });
       } else {
         desc.innerHTML = '💖 <b>舊客專屬優惠價</b>：單色 $490 / 貓眼·碎鑽·漸層·鏡面 $690 / 款式 $990 up。';
+        customTitle.innerText = '款式/自帶圖 ($990 up)';
+        customInput.value = 990;
+        updatePrices({ single: 490, cat: 690, diamond: 690, gradient: 690, mirror: 690, french: 1000 });
       }
 
-      renderStyles();
       calculate();
     }
 
-    function renderStyles() {
-      const container = document.getElementById('style-container');
-      container.innerHTML = '';
-
-      let styles = [];
-
-      if (currentMode === 'old') {
-        styles = [
-          { id: 'single', name: '單色', price: 490, sub: '純色 / 可跳一色' },
-          { id: 'cat', name: '貓眼', price: 690 },
-          { id: 'diamond', name: '碎鑽', price: 690 },
-          { id: 'gradient', name: '漸層', price: 690 },
-          { id: 'mirror', name: '鏡面', price: 690 },
-          { id: 'french', name: '法式', price: 1000 }
-        ];
-      } else {
-        styles = [
-          { id: 'single', name: '單色', price: 700, sub: '純色 / 可跳一色' },
-          { id: 'cat', name: '貓眼', price: 800 },
-          { id: 'diamond', name: '碎鑽', price: 800 },
-          { id: 'gradient', name: '漸層', price: 900 },
-          { id: 'mirror', name: '鏡面', price: 900 },
-          { id: 'french', name: '法式', price: 1000 }
-        ];
-      }
-
-      styles.forEach(s => {
-        let displayPrice = s.price;
-        if (currentMode === 'promo') {
-          displayPrice = Math.max(0, s.price - 200);
-        }
-
-        container.innerHTML += `
-          <div class="style-item ${selectedStyle === s.id ? 'active' : ''}" onclick="selectStyle('${s.id}')">
-            <div class="style-name">${s.name}</div>
-            <div class="style-price">$${displayPrice}</div>
-            ${s.sub ? `<div class="style-sub">${s.sub}</div>` : ''}
-          </div>
-        `;
-      });
-
-      // 帶圖款金額預設值
-      let defaultCustom = 1000;
-      if (currentMode === 'promo') defaultCustom = 800; // 新客活動直接帶入扣折後的 800
-      else if (currentMode === 'old') defaultCustom = 990;
-
-      let customLabel = currentMode === 'old' ? '款式/自帶圖 ($990 up)' : '客帶圖報價 ($1,000 up)';
-
-      container.innerHTML += `
-        <div class="custom-input-box ${selectedStyle === 'custom' ? 'active' : ''}" onclick="selectStyle('custom')">
-          <div class="style-name">${customLabel}</div>
-          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
-            報價金額：$
-            <input type="number" id="custom-val" class="custom-input" value="${defaultCustom}" step="50" onclick="event.stopPropagation(); selectStyle('custom');" oninput="calculate()">
-          </div>
-        </div>
-      `;
+    function updatePrices(pMap) {
+      document.getElementById('p-single').innerText = '$' + pMap.single;
+      document.getElementById('p-cat').innerText = '$' + pMap.cat;
+      document.getElementById('p-diamond').innerText = '$' + pMap.diamond;
+      document.getElementById('p-gradient').innerText = '$' + pMap.gradient;
+      document.getElementById('p-mirror').innerText = '$' + pMap.mirror;
+      document.getElementById('p-french').innerText = '$' + pMap.french;
     }
 
     function selectStyle(id) {
       selectedStyle = id;
-      renderStyles();
+      const allStyles = ['single', 'cat', 'diamond', 'gradient', 'mirror', 'french', 'custom'];
+      allStyles.forEach(s => {
+        const el = document.getElementById(`style-${s}`);
+        if (el) el.classList.toggle('active', s === id);
+      });
       calculate();
     }
 
@@ -632,7 +630,10 @@
         const names = { single: '單色', cat: '貓眼', diamond: '碎鑽', gradient: '漸層', mirror: '鏡面', french: '法式' };
         styleName = names[selectedStyle];
 
-        if (currentMode === 'old') {
+        if (currentMode === 'promo') {
+          const promoPrices = { single: 500, cat: 600, diamond: 600, gradient: 700, mirror: 700, french: 800 };
+          stylePrice = promoPrices[selectedStyle];
+        } else if (currentMode === 'old') {
           const oldPrices = { single: 490, cat: 690, diamond: 690, gradient: 690, mirror: 690, french: 1000 };
           stylePrice = oldPrices[selectedStyle];
         } else {
@@ -641,13 +642,8 @@
         }
       }
 
-      let finalStylePrice = stylePrice;
-      if (currentMode === 'promo' && selectedStyle !== 'custom') {
-        finalStylePrice = Math.max(0, stylePrice - 200);
-      }
-
-      total += finalStylePrice + locAdd;
-      summary.push(`• 【${locText}】${styleName}：$${finalStylePrice + locAdd}`);
+      total += stylePrice + locAdd;
+      summary.push(`• 【${locText}】${styleName}：$${stylePrice + locAdd}`);
 
       // 3. 加購項目
       if (countExt > 0) {
